@@ -8,6 +8,7 @@ import (
 	_ "image/jpeg" // Registra el decodificador JPEG
 	_ "image/png"  // Registra el decodificador PNG
 	"log"
+	"net/http" // Added for URL loading
 	"os"
 	"strings"
 
@@ -26,7 +27,7 @@ const asciiChars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqk
 
 func main() {
 	// Definir flags para la línea de comandos
-	imagePath := flag.String("image", "", "Ruta a la imagen de entrada (obligatorio)")
+	imagePath := flag.String("image", "", "Ruta a la imagen de entrada (local o URL) (obligatorio)")
 	outputFile := flag.String("output", "", "Ruta al archivo de salida para el arte ASCII (opcional)")
 	maxWidth := flag.Uint("width", 80, "Ancho máximo del arte ASCII en caracteres") // Ancho común de terminal
 	// También podrías añadir un flag para la altura o para invertir los caracteres
@@ -40,7 +41,15 @@ func main() {
 	}
 
 	// Cargar la imagen
-	img, err := loadImage(*imagePath)
+	var img image.Image
+	var err error
+
+	if strings.HasPrefix(*imagePath, "http://") || strings.HasPrefix(*imagePath, "https://") {
+		img, err = loadImageFromURL(*imagePath)
+	} else {
+		img, err = loadImage(*imagePath)
+	}
+
 	if err != nil {
 		log.Fatalf("Error al cargar la imagen: %v", err)
 	}
@@ -59,6 +68,26 @@ func main() {
 		}
 		fmt.Printf("\nArte ASCII guardado en: %s\n", *outputFile)
 	}
+}
+
+// loadImageFromURL descarga y carga una imagen desde una URL.
+func loadImageFromURL(url string) (image.Image, error) {
+	response, err := http.Get(url)
+	if err != nil {
+		return nil, fmt.Errorf("no se pudo descargar la imagen de '%s': %w", url, err)
+	}
+	defer response.Body.Close()
+
+	if response.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("error al descargar la imagen de '%s': status code %d", url, response.StatusCode)
+	}
+
+	img, format, err := image.Decode(response.Body)
+	if err != nil {
+		return nil, fmt.Errorf("no se pudo decodificar la imagen de la URL '%s': %w", url, err)
+	}
+	fmt.Printf("Imagen cargada desde URL: %s, Formato: %s\n", url, format)
+	return img, nil
 }
 
 // loadImage carga una imagen desde la ruta especificada.
