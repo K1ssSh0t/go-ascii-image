@@ -17,13 +17,14 @@ import (
 
 // Caracteres ASCII ordenados de oscuro a claro. Puedes ajustarlos.
 //const asciiChars = "@%#*+=-:. " // Más denso
-const asciiChars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@" // Más variado
+
+//const asciiChars = " `.-':_,^=;><+!rc*/z?sLTv)J7(|Fi{C}fI31tlu[neoZ5Yxjya]2ESwqkP6h9d4VpOGbUAKXHm8RD#$Bg0MNWQ%&@" // Más variado
 
 // O una versión más simple y común:
-// const asciiChars = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
+//const asciiChars = "$@B%8&WM#*oahkbdpqwmZO0QLCJUYXzcvunxrjft/\\|()1{}[]?-_+~<>i!lI;:,\"^`'. "
 
 // O incluso más simple:
-// const asciiChars = " .:!/r(l1Z4H9W8$@"
+ const asciiChars = " .:!/r(l1Z4H9W8$@"
 
 func main() {
 	// Definir flags para la línea de comandos
@@ -117,7 +118,7 @@ func imageToASCII(img image.Image, maxWidth uint) string {
 	// Se multiplica por 0.5 (o un factor similar) porque los caracteres suelen ser más altos que anchos
 	// y esto ayuda a que la proporción visual sea más correcta en la terminal.
 	aspectRatio := float64(originalHeight) / float64(originalWidth)
-	newHeight := uint(float64(maxWidth) * aspectRatio * 0.55) // Ajusta 0.55 según veas necesario
+	newHeight := uint(float64(maxWidth) * aspectRatio * 0.4) // Ajusta 0.4 según veas necesario
 
 	// Usar la biblioteca de redimensionamiento
 	resizedImg := resize.Resize(maxWidth, newHeight, img, resize.Lanczos3)
