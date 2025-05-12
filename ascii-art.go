@@ -1,3 +1,7 @@
+// Package main implements a command-line tool to convert images to ASCII art.
+// It supports loading images from local files or URLs, converting them to
+// grayscale ASCII or colorized block characters, and outputting to the console
+// or a file.
 package main
 
 import (
@@ -28,6 +32,9 @@ const asciiChars = " .:!/r(l1Z4H9W8$@"
 const resetColor = "\033[0m"
 const blockChar = "█" // Character to use for color mode
 
+// main is the entry point of the application.
+// It parses command-line arguments, loads an image, converts it to ASCII art,
+// prints it to the console, and optionally saves it to a file.
 func main() {
 	// Definir flags para la línea de comandos
 	imagePath := flag.String("image", "", "Ruta a la imagen de entrada (local o URL) (obligatorio)")
@@ -80,7 +87,8 @@ func main() {
 	}
 }
 
-// loadImageFromURL descarga y carga una imagen desde una URL.
+// loadImageFromURL downloads and decodes an image from the given URL.
+// It returns the decoded image or an error if the download or decoding fails.
 func loadImageFromURL(url string) (image.Image, error) {
 	response, err := http.Get(url)
 	if err != nil {
@@ -100,7 +108,8 @@ func loadImageFromURL(url string) (image.Image, error) {
 	return img, nil
 }
 
-// loadImage carga una imagen desde la ruta especificada.
+// loadImage loads and decodes an image from the specified local file path.
+// It returns the decoded image or an error if opening or decoding fails.
 func loadImage(filePath string) (image.Image, error) {
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -116,7 +125,10 @@ func loadImage(filePath string) (image.Image, error) {
 	return img, nil
 }
 
-// imageToASCII convierte una imagen a una cadena de arte ASCII.
+// imageToASCII converts an image to an ASCII art string.
+// It resizes the image based on maxWidth, then iterates over pixels.
+// If useColor is true, it generates a colorized block character representation
+// using ANSI escape codes. Otherwise, it maps pixel intensity to ASCII characters.
 func imageToASCII(img image.Image, maxWidth uint, useColor bool) string {
 	// Redimensionar la imagen para que se ajuste al ancho máximo, manteniendo la proporción
 	bounds := img.Bounds()
@@ -171,7 +183,8 @@ func imageToASCII(img image.Image, maxWidth uint, useColor bool) string {
 	return asciiBuilder.String()
 }
 
-// saveToFile guarda una cadena en un archivo.
+// saveToFile saves the given content string to a file at the specified filePath.
+// It returns an error if writing to the file fails.
 func saveToFile(content string, filePath string) error {
 	err := os.WriteFile(filePath, []byte(content), 0644) // 0644 son permisos estándar de archivo
 	if err != nil {
